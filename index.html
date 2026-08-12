@@ -95,6 +95,16 @@
   .btn+.btn{margin-top:10px;}
 
   .board{background:var(--void-2);border:1px solid rgba(236,227,203,0.1);border-radius:5px;padding:14px;margin-bottom:16px;}
+  .composition{
+    display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+    padding-bottom:11px;margin-bottom:12px;border-bottom:1px solid rgba(236,227,203,0.08);
+  }
+  .comp-label{
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.13em;
+    text-transform:uppercase;color:var(--brass);
+  }
+  .comp-value{font-size:12.5px;color:var(--paper-2);text-align:right;}
+
   .track{margin-bottom:12px;}
   .track-head{
     display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;
@@ -504,6 +514,8 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 
 function renderBoard(g){
   const powers=powersFor(g.players.length);
+  const cfg=SETUP[g.players.length] || {lib:0,fasc:0};
+  const composition = `${cfg.lib} Liberal${cfg.lib>1?'s':''} · ${cfg.fasc} Fascist${cfg.fasc>1?'s':''} · 1 Hitler`;
   let fascSlots='';
   for(let i=0;i<6;i++){
     const pw = powers[i] ? POWER_SHORT[powers[i]] : '';
@@ -516,6 +528,10 @@ function renderBoard(g){
 
   document.getElementById('boardWrap').innerHTML = `
     <div class="board">
+      <div class="composition">
+        <span class="comp-label">This Table</span>
+        <span class="comp-value">${composition}</span>
+      </div>
       <div class="track">
         <div class="track-head"><span class="lib">Liberal Policies</span><span class="cnt">${g.lib} / 5</span></div>
         <div class="slots">${libSlots}</div>
@@ -575,7 +591,12 @@ function renderRoleReveal(g){
   } else {
     know=`<div class="know-box"><div class="know-title">Known to you</div><ul class="know-list"><li>Nothing. You must work it out.</li></ul></div>`;
   }
-  document.getElementById('knowWrap').innerHTML=know;
+  const cfg=SETUP[n] || {lib:0,fasc:0};
+  const compLine = `<div class="know-box" style="margin-bottom:16px;">
+      <div class="know-title">This Table</div>
+      <div style="font-size:14px;color:var(--paper-2);">${cfg.lib} Liberal${cfg.lib>1?'s':''} · ${cfg.fasc} Fascist${cfg.fasc>1?'s':''} · 1 Hitler <span style="color:var(--ash);">(${n} players)</span></div>
+    </div>`;
+  document.getElementById('knowWrap').innerHTML=compLine+know;
 
   const seen=g.players.filter(p=>p.seen).length;
   const btn=document.getElementById('roleAckBtn');
