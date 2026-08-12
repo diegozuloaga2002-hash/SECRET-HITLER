@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#14110F">
+<title>Secret Hitler — Table Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#14110F; --void-2:#1B1712;
+    --paper:#ECE3CB; --paper-2:#DCCFA9;
+    --crimson:#A31F22; --crimson-dark:#711416;
+    --teal:#2E4A52; --teal-dark:#1E3236; --teal-light:#7FB0BB;
+    --brass:#C7A233; --ink:#211C15; --ash:#8C8577;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--void);color:var(--paper);min-height:100%;}
+  body{
+    font-family:'PT Serif',serif;
+    background-image:
+      radial-gradient(ellipse at 20% -10%, rgba(163,31,34,0.10), transparent 45%),
+      radial-gradient(ellipse at 90% 110%, rgba(46,74,82,0.14), transparent 50%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+  }
+  header.app-header{
+    width:100%; max-width:460px; padding:16px 20px 10px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid rgba(236,227,203,0.1);
+  }
+  .brand{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:14px;}
+  .brand span{color:var(--crimson);}
+  .hdr-right{display:flex;align-items:center;gap:9px;}
+  .badge{
+    font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--void-2);
+    border:1px solid rgba(236,227,203,0.18);color:var(--paper-2);padding:5px 8px;border-radius:3px;
+  }
+  .leave-link{
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--ash);background:none;border:none;cursor:pointer;padding:4px;
+  }
+  main{width:100%;max-width:460px;flex:1;padding:20px 20px 44px;display:flex;flex-direction:column;}
+  .screen{display:none;animation:fadeIn .3s ease;}
+  .screen.active{display:flex;flex-direction:column;flex:1;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .folder{
+    background:var(--paper);color:var(--ink);border-radius:2px;position:relative;
+    padding:26px 20px 20px;box-shadow:0 18px 40px rgba(0,0,0,0.45);
+  }
+  .folder::before{
+    content:attr(data-tab);position:absolute;top:-15px;left:16px;
+    background:var(--brass);color:var(--ink);font-family:'Oswald',sans-serif;
+    font-weight:600;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;
+    padding:5px 10px 4px;border-radius:2px 2px 0 0;
+  }
+  h1.title{font-family:'Oswald',sans-serif;font-size:22px;text-transform:uppercase;letter-spacing:0.03em;margin:2px 0 4px;}
+  p.sub{color:#54493a;font-size:14px;line-height:1.5;margin:0 0 18px;}
+  label.field-label{
+    font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:0.12em;
+    text-transform:uppercase;color:#6b5e49;display:block;margin-bottom:6px;
+  }
+  input[type=text],select{
+    width:100%;font-family:'JetBrains Mono',monospace;font-size:16px;padding:12px;
+    border:1.5px solid #b7a97f;background:#F6F0DC;color:var(--ink);
+    border-radius:3px;margin-bottom:14px;outline:none;
+  }
+  input[type=text]:focus,select:focus{border-color:var(--crimson);}
+  .btn{
+    font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.09em;
+    font-weight:600;font-size:14px;padding:14px 16px;border-radius:3px;
+    border:none;cursor:pointer;width:100%;transition:transform .12s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn:disabled{opacity:0.45;cursor:default;}
+  .btn-primary{background:var(--ink);color:var(--paper);}
+  .btn-danger{background:var(--crimson);color:var(--paper);}
+  .btn-ghost{background:transparent;border:1.5px solid rgba(236,227,203,0.25);color:var(--paper-2);}
+  .btn+.btn{margin-top:10px;}
+
+  .board{background:var(--void-2);border:1px solid rgba(236,227,203,0.1);border-radius:5px;padding:14px;margin-bottom:16px;}
+  .track{margin-bottom:12px;}
+  .track-head{
+    display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;
+  }
+  .track-head .lib{color:var(--teal-light);}
+  .track-head .fasc{color:#e08a8c;}
+  .track-head .cnt{font-family:'JetBrains Mono',monospace;color:var(--ash);font-size:11px;}
+  .slots{display:flex;gap:5px;}
+  .slot{flex:1;height:22px;border-radius:2px;border:1px solid rgba(236,227,203,0.16);background:rgba(0,0,0,0.25);position:relative;}
+  .slot.filled-lib{background:var(--teal);border-color:var(--teal-light);}
+  .slot.filled-fasc{background:var(--crimson);border-color:#e08a8c;}
+  .slot .pw{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:8.5px;font-family:'Oswald',sans-serif;color:rgba(236,227,203,0.45);letter-spacing:0.03em;
+  }
+  .tracker-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(236,227,203,0.08);}
+  .tracker-label{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash);}
+  .pips{display:flex;gap:5px;}
+  .pip{width:11px;height:11px;border-radius:50%;border:1px solid var(--ash);}
+  .pip.on{background:var(--brass);border-color:var(--brass);}
+  .deck-count{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ash);}
+
+  .players{background:var(--void-2);border:1px solid rgba(236,227,203,0.1);border-radius:5px;padding:12px 14px;margin-bottom:16px;}
+  .players-title{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:var(--brass);margin-bottom:9px;}
+  .prow{display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid rgba(236,227,203,0.06);font-size:14px;}
+  .prow:last-child{border-bottom:none;}
+  .prow.dead{opacity:0.4;text-decoration:line-through;}
+  .prow .pname{flex:1;}
+  .ptag{font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:0.09em;text-transform:uppercase;padding:3px 6px;border-radius:2px;}
+  .ptag.pres{background:var(--brass);color:var(--ink);}
+  .ptag.chan{background:var(--paper-2);color:var(--ink);}
+  .ptag.prev{background:rgba(236,227,203,0.12);color:var(--ash);}
+  .ptag.you{background:rgba(163,31,34,0.3);color:#f0a5a7;}
+
+  .role-card{border-radius:6px;padding:26px 20px;text-align:center;margin-bottom:16px;border:3px solid;}
+  .role-card.liberal{background:rgba(46,74,82,0.2);border-color:var(--teal);}
+  .role-card.fascist,.role-card.hitler{background:rgba(163,31,34,0.2);border-color:var(--crimson);}
+  .role-eyebrow{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);margin-bottom:8px;}
+  .role-name{font-family:'Oswald',sans-serif;font-size:34px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+  .role-card.liberal .role-name{color:var(--teal-light);}
+  .role-card.fascist .role-name,.role-card.hitler .role-name{color:#e08a8c;}
+  .role-party{font-size:13px;color:var(--paper-2);margin-top:8px;}
+  .know-box{background:var(--void-2);border:1px solid rgba(236,227,203,0.12);border-radius:4px;padding:14px;margin-bottom:16px;}
+  .know-title{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:var(--brass);margin-bottom:8px;}
+  .know-list{margin:0;padding-left:18px;font-size:14px;line-height:1.7;}
+
+  .policy-row{display:flex;gap:10px;margin:6px 0 14px;}
+  .pcard{
+    flex:1;aspect-ratio:2/3;border-radius:5px;border:3px solid;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:13px;
+    text-transform:uppercase;letter-spacing:0.05em;padding:8px;transition:transform .12s ease;
+  }
+  .pcard.lib{background:var(--teal);border-color:var(--teal-light);color:#DFF1F5;}
+  .pcard.fasc{background:var(--crimson);border-color:#e08a8c;color:#FFE8E8;}
+  .pcard:active{transform:scale(0.95);}
+
+  .gov-strip{display:flex;gap:10px;margin-bottom:16px;}
+  .gov-slot{flex:1;text-align:center;background:#F6F0DC;border:1px solid #b7a97f;border-radius:3px;padding:11px 8px;}
+  .gov-slot .role{font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8a7a55;margin-bottom:3px;}
+  .gov-slot .who{font-weight:700;font-size:15px;color:var(--ink);}
+  .vote-buttons{display:flex;gap:12px;margin-top:4px;}
+  .vote-btn{
+    flex:1;aspect-ratio:1/0.8;border-radius:6px;border:3px solid;
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:26px;letter-spacing:0.06em;cursor:pointer;
+  }
+  .vote-btn:active{transform:scale(0.96);}
+  .vote-btn.ja{background:rgba(163,31,34,0.08);border-color:var(--crimson);color:var(--crimson-dark);}
+  .vote-btn.nein{background:rgba(46,74,82,0.08);border-color:var(--teal);color:var(--teal-dark);}
+
+  .stamp-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(20,17,15,0.6);z-index:50;}
+  .stamp-overlay.show{display:flex;}
+  .stamp-word{
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:54px;letter-spacing:0.06em;
+    text-transform:uppercase;padding:16px 32px;border:6px solid currentColor;border-radius:8px;
+    transform:scale(3) rotate(-10deg);opacity:0;box-shadow:0 0 0 3px currentColor inset;
+  }
+  .stamp-word.animate{animation:stampDown .55s cubic-bezier(.2,1.4,.4,1) forwards;}
+  @keyframes stampDown{
+    0%{transform:scale(3.4) rotate(-14deg);opacity:0;}
+    55%{transform:scale(0.92) rotate(-7deg);opacity:1;}
+    100%{transform:scale(1) rotate(-8deg);opacity:1;}
+  }
+
+  .waiting-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 10px;flex:1;justify-content:center;}
+  .seal{width:70px;height:70px;border:3px solid var(--brass);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:18px;animation:pulse 1.8s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(199,162,51,0.25);}50%{box-shadow:0 0 0 12px rgba(199,162,51,0);}}
+  .seal svg{width:30px;height:30px;fill:var(--brass);}
+  .waiting-wrap h2{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.06em;font-size:17px;margin:0 0 8px;}
+  .waiting-wrap p{color:var(--ash);font-size:14px;margin:0 0 18px;line-height:1.5;}
+  .progress-track{width:100%;max-width:210px;height:6px;background:var(--void-2);border-radius:4px;overflow:hidden;border:1px solid rgba(236,227,203,0.15);}
+  .progress-fill{height:100%;background:var(--brass);transition:width .4s ease;}
+  .progress-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--paper-2);margin-top:9px;}
+
+  .result-banner{text-align:center;padding:20px 14px;border-radius:4px;margin-bottom:16px;border:2px solid;}
+  .result-banner.fail{background:rgba(163,31,34,0.14);border-color:var(--crimson);}
+  .result-banner .verdict{font-family:'Oswald',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.05em;text-transform:uppercase;color:#e08a8c;}
+  .tally-row{display:flex;gap:12px;margin-bottom:16px;}
+  .tally-card{flex:1;background:var(--void-2);border:1px solid rgba(236,227,203,0.1);border-radius:4px;padding:14px;text-align:center;}
+  .tally-card .num{font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;}
+  .tally-card.ja .num{color:#e08a8c;}
+  .tally-card.nein .num{color:var(--teal-light);}
+  .tally-card .lbl{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash);margin-top:3px;}
+
+  .win-screen{text-align:center;padding:30px 16px;border-radius:6px;border:3px solid;margin-bottom:16px;}
+  .win-screen.lib{background:rgba(46,74,82,0.2);border-color:var(--teal);}
+  .win-screen.fasc{background:rgba(163,31,34,0.2);border-color:var(--crimson);}
+  .win-title{font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+  .win-screen.lib .win-title{color:var(--teal-light);}
+  .win-screen.fasc .win-title{color:#e08a8c;}
+  .win-reason{font-size:14px;color:var(--paper-2);margin-top:10px;line-height:1.5;}
+  .reveal-list{background:var(--void-2);border:1px solid rgba(236,227,203,0.1);border-radius:5px;padding:12px 14px;margin-bottom:16px;}
+  .rrow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(236,227,203,0.06);font-size:14px;}
+  .rrow:last-child{border-bottom:none;}
+  .rrole{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;}
+  .rrole.lib{color:var(--teal-light);}
+  .rrole.fasc{color:#e08a8c;}
+  .rrole.hit{color:var(--brass);}
+
+  .log{margin-top:20px;}
+  .log-title{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:var(--brass);margin-bottom:8px;}
+  .log-item{font-size:12.5px;color:var(--ash);padding:5px 0;border-bottom:1px solid rgba(236,227,203,0.06);line-height:1.45;}
+
+  .toast{
+    position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);font-family:'Oswald',sans-serif;font-size:12.5px;
+    padding:10px 16px;border-radius:4px;border:1px solid var(--crimson);opacity:0;
+    transition:all .25s ease;pointer-events:none;z-index:60;max-width:90%;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .attribution{
+    margin-top:26px;font-size:11px;color:#5a5449;line-height:1.6;text-align:center;
+    border-top:1px solid rgba(236,227,203,0.07);padding-top:14px;
+  }
+  .attribution a{color:#6f6757;}
+  .hint{font-size:12.5px;color:var(--ash);line-height:1.5;margin-top:14px;}
+  .hint-dark{font-size:12.5px;color:#6b5e49;line-height:1.5;margin-top:12px;}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">Secret <span>Hitler</span></div>
+  <div class="hdr-right" id="hdrRight" style="display:none;">
+    <span class="badge" id="hdrRoom"></span>
+    <button class="leave-link" id="leaveBtn">Leave</button>
+  </div>
+</header>
+
+<main>
+
+  <section class="screen" id="screen-setup">
+    <div class="folder" data-tab="One-Time Setup">
+      <h1 class="title">Connect a Database</h1>
+      <p class="sub">Paste your Firebase Realtime Database URL to use this page.</p>
+      <label class="field-label" for="dbInput">Realtime Database URL</label>
+      <input type="text" id="dbInput" placeholder="https://…firebasedatabase.app">
+      <button class="btn btn-primary" id="dbSaveBtn">Save &amp; Test</button>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-join">
+    <div class="folder" data-tab="Classified · Eyes Only">
+      <h1 class="title">Enter the Chamber</h1>
+      <p class="sub">Agree on a room code with your table — everyone types the same one.</p>
+      <label class="field-label" for="nameInput">Your name</label>
+      <input type="text" id="nameInput" placeholder="e.g. Diego" maxlength="20">
+      <label class="field-label" for="codeInput">Room code</label>
+      <input type="text" id="codeInput" placeholder="e.g. WOLF" maxlength="12" style="text-transform:uppercase;">
+      <button class="btn btn-primary" id="joinBtn">Enter Room</button>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-lobby">
+    <div class="folder" data-tab="Assembly">
+      <h1 class="title">Chamber Roster</h1>
+      <p class="sub">Everyone joins on their own phone. Five to ten players. Any player can deal.</p>
+      <div id="lobbyPlayers"></div>
+      <button class="btn btn-primary" id="dealBtn" style="margin-top:16px;">Deal Roles &amp; Begin</button>
+      <p class="hint-dark" id="lobbyHint"></p>
+    </div>
+    <div class="attribution">
+      Adapted from <strong>Secret Hitler</strong> by Goat, Wolf &amp; Cabbage — designed by Mike Boxleiter, Tommy Maranges and Max Temkin, art by Mackenzie Schubert.
+      Licensed <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. This non-commercial adaptation is shared under the same licence.
+    </div>
+  </section>
+
+  <section class="screen" id="screen-role">
+    <div id="roleCardWrap"></div>
+    <div id="knowWrap"></div>
+    <button class="btn btn-primary" id="roleAckBtn">I've Memorised It</button>
+    <p class="hint">Keep this private. The game starts once everyone has looked.</p>
+  </section>
+
+  <section class="screen" id="screen-game">
+    <div id="boardWrap"></div>
+    <div id="gameBody"></div>
+    <div class="log">
+      <div class="log-title">Record of Proceedings</div>
+      <div id="logWrap"></div>
+    </div>
+  </section>
+
+</main>
+
+<div class="stamp-overlay" id="stampOverlay"><div class="stamp-word" id="stampWord">JA</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const FIREBASE_DB_URL = "https://sh-soria-default-rtdb.europe-west1.firebasedatabase.app";
+
+function getDbUrl(){
+  if(FIREBASE_DB_URL && FIREBASE_DB_URL.trim()) return FIREBASE_DB_URL.trim().replace(/\/+$/,'');
+  try{ const s = localStorage.getItem('sh_db_url'); return s ? s.replace(/\/+$/,'') : ''; }catch(e){ return ''; }
+}
+
+const S = { name:'', code:'', joined:false, db:'', game:null };
+let pollTimer = null;
+
+async function dbGet(path){
+  const r = await fetch(`${S.db}/${path}.json`, {cache:'no-store'});
+  if(!r.ok) throw new Error('read ' + r.status);
+  return await r.json();
+}
+async function dbPut(path, value){
+  const r = await fetch(`${S.db}/${path}.json`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(value)});
+  if(!r.ok) throw new Error('write ' + r.status);
+  return await r.json();
+}
+async function dbDel(path){ try{ await fetch(`${S.db}/${path}.json`,{method:'DELETE'}); }catch(e){} }
+function safeKey(s){ return String(s).replace(/[.$#\[\]\/]/g,'_'); }
+
+const SETUP = {5:{lib:3,fasc:1},6:{lib:4,fasc:1},7:{lib:4,fasc:2},8:{lib:5,fasc:2},9:{lib:5,fasc:3},10:{lib:6,fasc:3}};
+function powersFor(n){
+  if(n<=6) return [null,null,'peek','execute','execute'];
+  if(n<=8) return [null,'investigate','specialElection','execute','execute'];
+  return ['investigate','investigate','specialElection','execute','execute'];
+}
+const POWER_LABEL = {peek:'Policy Peek',investigate:'Investigate Loyalty',specialElection:'Special Election',execute:'Execution'};
+const POWER_SHORT = {peek:'Peek',investigate:'Investigate',specialElection:'Sp. Election',execute:'Execute'};
+
+function shuffle(a){
+  const x = a.slice();
+  for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; }
+  return x;
+}
+function makeDeck(){
+  const d=[];
+  for(let i=0;i<6;i++) d.push('lib');
+  for(let i=0;i<11;i++) d.push('fasc');
+  return shuffle(d);
+}
+function ensureDeck(g, need){
+  if((g.deck||[]).length >= need) return;
+  g.deck = shuffle((g.deck||[]).concat(g.discard||[]));
+  g.discard = [];
+}
+
+function alivePlayers(g){ return g.players.filter(p=>p.alive); }
+function me(g){ return g.players.find(p=>p.name===S.name); }
+function playerByName(g,n){ return g.players.find(p=>p.name===n); }
+function currentPresident(g){ return g.players[g.presidentIndex]; }
+function isMe(n){ return n===S.name; }
+function nextPresIndex(g, from){
+  const n=g.players.length; let i=from;
+  for(let k=0;k<n;k++){ i=(i+1)%n; if(g.players[i].alive) return i; }
+  return from;
+}
+function addLog(g,t){ g.log=g.log||[]; g.log.unshift(t); if(g.log.length>30) g.log.length=30; }
+
+function dealGame(names){
+  const n=names.length, cfg=SETUP[n];
+  const roles=[];
+  for(let i=0;i<cfg.lib;i++) roles.push('liberal');
+  for(let i=0;i<cfg.fasc;i++) roles.push('fascist');
+  roles.push('hitler');
+  const sr=shuffle(roles), order=shuffle(names);
+  const players=order.map((nm,i)=>({
+    name:nm, role:sr[i], party: sr[i]==='liberal'?'liberal':'fascist', alive:true, seen:false
+  }));
+  return {
+    phase:'roleReveal', players, presidentIndex:0,
+    nominee:null, prevPresident:null, prevChancellor:null, chancellor:null,
+    votes:{}, lib:0, fasc:0, tracker:0,
+    deck:makeDeck(), discard:[], presHand:null, chanHand:null,
+    vetoRequested:false, pendingPower:null, investigated:{}, specialReturn:null,
+    winner:null, winReason:'', log:['Roles dealt. Everyone check your card.'], round:1
+  };
+}
+
+async function saveGame(g){ await dbPut(`games/${S.code}`, g); S.game=g; }
+
+function beginNomination(g){
+  g.phase='nomination'; g.nominee=null; g.votes={}; g.chancellor=null;
+  g.presHand=null; g.chanHand=null; g.vetoRequested=false; g.pendingPower=null;
+}
+
+function eligibleChancellors(g){
+  const pres=currentPresident(g), aliveCount=alivePlayers(g).length;
+  return alivePlayers(g).filter(p=>{
+    if(p.name===pres.name) return false;
+    if(g.prevChancellor===p.name) return false;
+    if(aliveCount>5 && g.prevPresident===p.name) return false;
+    return true;
+  });
+}
+
+function advanceAfterPolicy(g){
+  if(g.winner) return;
+  if(g.specialReturn!==null && g.specialReturn!==undefined){
+    g.presidentIndex = nextPresIndex(g, g.specialReturn);
+    g.specialReturn = null;
+  } else {
+    g.presidentIndex = nextPresIndex(g, g.presidentIndex);
+  }
+  g.round++;
+  beginNomination(g);
+}
+
+function enactPolicy(g, type, byChaos){
+  if(type==='lib') g.lib++; else g.fasc++;
+  if(type==='lib' && g.lib>=5){
+    g.winner='liberal'; g.winReason='Five Liberal policies were enacted.'; g.phase='gameOver'; return;
+  }
+  if(type==='fasc' && g.fasc>=6){
+    g.winner='fascist'; g.winReason='Six Fascist policies were enacted.'; g.phase='gameOver'; return;
+  }
+  if(type==='fasc' && !byChaos){
+    const power = powersFor(g.players.length)[g.fasc-1];
+    if(power){
+      g.pendingPower=power; g.phase='power';
+      addLog(g, `Presidential power unlocked: ${POWER_LABEL[power]}.`);
+      if(power==='peek'){ ensureDeck(g,3); g.peek=g.deck.slice(0,3); }
+      return;
+    }
+  }
+  advanceAfterPolicy(g);
+}
+
+function resolveElection(g){
+  const voters=alivePlayers(g);
+  let ja=0,nein=0;
+  voters.forEach(p=>{
+    const v=g.votes[safeKey(p.name)];
+    if(v==='ja') ja++; else if(v==='nein') nein++;
+  });
+  g.lastTally={ja,nein};
+
+  if(ja>nein){
+    g.chancellor=g.nominee;
+    if(g.fasc>=3){
+      const ch=playerByName(g,g.chancellor);
+      if(ch && ch.role==='hitler'){
+        g.winner='fascist';
+        g.winReason=`${ch.name} was Hitler, elected Chancellor after three Fascist policies.`;
+        g.phase='gameOver';
+        addLog(g,'The government passed — and the Chancellor was Hitler.');
+        return;
+      }
+    }
+    g.tracker=0;
+    g.prevPresident=currentPresident(g).name;
+    g.prevChancellor=g.chancellor;
+    ensureDeck(g,3);
+    g.presHand=g.deck.slice(0,3);
+    g.deck=g.deck.slice(3);
+    g.phase='legPresident';
+    addLog(g, `Elected: ${currentPresident(g).name} / ${g.chancellor} (${ja}–${nein}).`);
+  } else {
+    addLog(g, `Rejected: ${currentPresident(g).name} / ${g.nominee} (${ja}–${nein}).`);
+    g.tracker++;
+    g.phase='electionResult';
+    if(g.tracker>=3){
+      ensureDeck(g,1);
+      g.chaosPolicy=g.deck.shift();
+      g.tracker=0; g.prevPresident=null; g.prevChancellor=null;
+      addLog(g, `Chaos — a ${g.chaosPolicy==='lib'?'Liberal':'Fascist'} policy is enacted from the deck.`);
+    }
+  }
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderBoard(g){
+  const powers=powersFor(g.players.length);
+  let fascSlots='';
+  for(let i=0;i<6;i++){
+    const pw = powers[i] ? POWER_SHORT[powers[i]] : '';
+    fascSlots += `<div class="slot ${i<g.fasc?'filled-fasc':''}"><span class="pw">${i<g.fasc?'':esc(pw)}</span></div>`;
+  }
+  let libSlots='';
+  for(let i=0;i<5;i++) libSlots += `<div class="slot ${i<g.lib?'filled-lib':''}"></div>`;
+  let pips='';
+  for(let i=0;i<3;i++) pips += `<div class="pip ${i<g.tracker?'on':''}"></div>`;
+
+  document.getElementById('boardWrap').innerHTML = `
+    <div class="board">
+      <div class="track">
+        <div class="track-head"><span class="lib">Liberal Policies</span><span class="cnt">${g.lib} / 5</span></div>
+        <div class="slots">${libSlots}</div>
+      </div>
+      <div class="track" style="margin-bottom:0;">
+        <div class="track-head"><span class="fasc">Fascist Policies</span><span class="cnt">${g.fasc} / 6</span></div>
+        <div class="slots">${fascSlots}</div>
+      </div>
+      <div class="tracker-row">
+        <span class="tracker-label">Election Tracker</span>
+        <div class="pips">${pips}</div>
+        <span class="deck-count">deck ${(g.deck||[]).length} · disc ${(g.discard||[]).length}</span>
+      </div>
+    </div>
+    ${renderPlayers(g)}`;
+}
+
+function renderPlayers(g){
+  const pres=currentPresident(g);
+  const rows=g.players.map(p=>{
+    let tags='';
+    if(p.name===pres.name) tags+='<span class="ptag pres">Pres</span>';
+    if(g.chancellor===p.name) tags+='<span class="ptag chan">Chan</span>';
+    else if(g.prevChancellor===p.name) tags+='<span class="ptag prev">Prev Chan</span>';
+    if(g.prevPresident===p.name && g.chancellor!==p.name && p.name!==pres.name) tags+='<span class="ptag prev">Prev Pres</span>';
+    if(isMe(p.name)) tags+='<span class="ptag you">You</span>';
+    return `<div class="prow ${p.alive?'':'dead'}"><span class="pname">${esc(p.name)}</span>${tags}</div>`;
+  }).join('');
+  return `<div class="players"><div class="players-title">The Table</div>${rows}</div>`;
+}
+
+function renderRoleReveal(g){
+  const m=me(g);
+  if(!m) return;
+  const roleName = m.role==='hitler'?'Hitler':(m.role==='fascist'?'Fascist':'Liberal');
+  const cls = m.role==='liberal'?'liberal':(m.role==='hitler'?'hitler':'fascist');
+  document.getElementById('roleCardWrap').innerHTML = `
+    <div class="role-card ${cls}">
+      <div class="role-eyebrow">Your Secret Role</div>
+      <div class="role-name">${roleName}</div>
+      <div class="role-party">Party membership: ${m.party==='liberal'?'Liberal':'Fascist'}</div>
+    </div>`;
+
+  const n=g.players.length;
+  let know='';
+  if(m.role==='fascist'){
+    const others=g.players.filter(p=>p.name!==m.name && (p.role==='fascist'||p.role==='hitler'))
+      .map(p=>`<li>${esc(p.name)} — ${p.role==='hitler'?'<strong>Hitler</strong>':'Fascist'}</li>`).join('');
+    know=`<div class="know-box"><div class="know-title">Known to you</div><ul class="know-list">${others}</ul></div>`;
+  } else if(m.role==='hitler'){
+    if(n<=6){
+      const f=g.players.filter(p=>p.role==='fascist').map(p=>`<li>${esc(p.name)} — Fascist</li>`).join('');
+      know=`<div class="know-box"><div class="know-title">Your fellow Fascist</div><ul class="know-list">${f}</ul></div>`;
+    } else {
+      know=`<div class="know-box"><div class="know-title">Known to you</div><ul class="know-list"><li>Nothing. With ${n} players, Hitler does not know the Fascists — but they know you.</li></ul></div>`;
+    }
+  } else {
+    know=`<div class="know-box"><div class="know-title">Known to you</div><ul class="know-list"><li>Nothing. You must work it out.</li></ul></div>`;
+  }
+  document.getElementById('knowWrap').innerHTML=know;
+
+  const seen=g.players.filter(p=>p.seen).length;
+  const btn=document.getElementById('roleAckBtn');
+  if(m.seen){ btn.disabled=true; btn.textContent=`Waiting — ${seen} / ${g.players.length} ready`; }
+  else { btn.disabled=false; btn.textContent="I've Memorised It"; }
+}
+
+function waitingBlock(title, sub, count, total){
+  let prog='';
+  if(total){
+    prog=`<div class="progress-track"><div class="progress-fill" style="width:${Math.min(100,(count/total)*100)}%"></div></div>
+          <div class="progress-label">${count} / ${total}</div>`;
+  }
+  return `<div class="waiting-wrap">
+    <div class="seal"><svg viewBox="0 0 24 24"><path d="M12 1l3.5 2 4 .5.5 4L22 11l-2 3.5.5 4-4 .5L13 22l-1-1-1 1-3.5-3-4-.5.5-4L2 11l2-3.5-.5-4 4-.5L11 1z"/></svg></div>
+    <h2>${title}</h2><p>${sub}</p>${prog}</div>`;
+}
+
+function renderGame(g){
+  const body=document.getElementById('gameBody');
+  const m=me(g), pres=currentPresident(g);
+  const iAmPres = m && pres.name===m.name;
+  const iAmChan = m && g.chancellor===m.name;
+
+  if(g.phase==='gameOver'){
+    const cls = g.winner==='liberal'?'lib':'fasc';
+    const rows=g.players.map(p=>{
+      const rc=p.role==='liberal'?'lib':(p.role==='hitler'?'hit':'fasc');
+      const rn=p.role==='liberal'?'Liberal':(p.role==='hitler'?'Hitler':'Fascist');
+      return `<div class="rrow"><span>${esc(p.name)}${p.alive?'':' (executed)'}</span><span class="rrole ${rc}">${rn}</span></div>`;
+    }).join('');
+    body.innerHTML = `
+      <div class="win-screen ${cls}">
+        <div class="win-title">${g.winner==='liberal'?'Liberals Win':'Fascists Win'}</div>
+        <div class="win-reason">${esc(g.winReason)}</div>
+      </div>
+      <div class="reveal-list">${rows}</div>
+      <button class="btn btn-primary" id="againBtn">Play Again — Same Table</button>
+      <button class="btn btn-ghost" id="backLobbyBtn">Back to Lobby</button>`;
+    document.getElementById('againBtn').onclick = async ()=>{
+      await saveGame(dealGame(g.players.map(p=>p.name)));
+    };
+    document.getElementById('backLobbyBtn').onclick = async ()=>{ await dbDel(`games/${S.code}`); };
+    return;
+  }
+
+  if(m && !m.alive){
+    body.innerHTML = waitingBlock('You Have Been Executed',
+      'You can still watch the board, but you no longer vote or hold office.',0,0);
+    return;
+  }
+
+  if(g.phase==='nomination'){
+    if(iAmPres){
+      const elig=eligibleChancellors(g);
+      body.innerHTML = `
+        <div class="folder" data-tab="Round ${g.round}">
+          <h1 class="title">Nominate a Chancellor</h1>
+          <p class="sub">You are President. Choose who governs with you — the table then votes.</p>
+          <label class="field-label">Eligible candidates</label>
+          <select id="nomSelect">${elig.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('')}</select>
+          <button class="btn btn-primary" id="nomBtn">Put to the Vote</button>
+        </div>`;
+      document.getElementById('nomBtn').onclick = async ()=>{
+        const g2=await dbGet(`games/${S.code}`);
+        if(g2.phase!=='nomination') return;
+        g2.nominee=document.getElementById('nomSelect').value;
+        g2.votes={}; g2.phase='election';
+        addLog(g2, `${pres.name} nominates ${g2.nominee} as Chancellor.`);
+        await saveGame(g2);
+      };
+    } else {
+      body.innerHTML = waitingBlock('Nomination in Progress', `${esc(pres.name)} is choosing a Chancellor.`,0,0);
+    }
+    return;
+  }
+
+  if(g.phase==='election'){
+    const voters=alivePlayers(g);
+    const voted=Object.keys(g.votes||{}).length;
+    const iVoted=g.votes && g.votes[safeKey(S.name)];
+    if(!iVoted){
+      body.innerHTML = `
+        <div class="folder" data-tab="Ballot Open">
+          <h1 class="title">Cast Your Vote</h1>
+          <p class="sub">Your choice stays hidden. Only the totals are revealed.</p>
+          <div class="gov-strip">
+            <div class="gov-slot"><div class="role">President</div><div class="who">${esc(pres.name)}</div></div>
+            <div class="gov-slot"><div class="role">Chancellor</div><div class="who">${esc(g.nominee)}</div></div>
+          </div>
+          <div class="vote-buttons">
+            <button class="vote-btn ja" id="jaBtn">JA</button>
+            <button class="vote-btn nein" id="neinBtn">NEIN</button>
+          </div>
+        </div>`;
+      document.getElementById('jaBtn').onclick=()=>submitVote('ja');
+      document.getElementById('neinBtn').onclick=()=>submitVote('nein');
+    } else {
+      body.innerHTML = waitingBlock('Ballot Sealed',
+        `${esc(pres.name)} / ${esc(g.nominee)} — waiting on the table.`, voted, voters.length);
+      if(voted>=voters.length){
+        (async ()=>{
+          const g2=await dbGet(`games/${S.code}`);
+          if(!g2 || g2.phase!=='election') return;
+          if(Object.keys(g2.votes||{}).length < alivePlayers(g2).length) return;
+          resolveElection(g2);
+          await saveGame(g2);
+        })();
+      }
+    }
+    return;
+  }
+
+  if(g.phase==='electionResult'){
+    const t=g.lastTally||{ja:0,nein:0};
+    body.innerHTML = `
+      <div class="folder" data-tab="Result">
+        <h1 class="title">Government Fails</h1>
+        <p class="sub">${esc(pres.name)} / ${esc(g.nominee)} was rejected.</p>
+        <div class="result-banner fail"><div class="verdict">Rejected</div></div>
+        <div class="tally-row">
+          <div class="tally-card ja"><div class="num">${t.ja}</div><div class="lbl">Ja</div></div>
+          <div class="tally-card nein"><div class="num">${t.nein}</div><div class="lbl">Nein</div></div>
+        </div>
+        ${g.chaosPolicy ? `<p class="sub"><strong>Chaos.</strong> Three governments have failed in a row. A ${g.chaosPolicy==='lib'?'Liberal':'Fascist'} policy is enacted from the top of the deck, and all term limits are lifted.</p>` : ''}
+        <button class="btn btn-primary" id="contBtn">Continue</button>
+      </div>`;
+    document.getElementById('contBtn').onclick = async ()=>{
+      const g2=await dbGet(`games/${S.code}`);
+      if(!g2 || g2.phase!=='electionResult') return;
+      if(g2.chaosPolicy){
+        const p=g2.chaosPolicy; g2.chaosPolicy=null;
+        enactPolicy(g2,p,true);
+      } else {
+        advanceAfterPolicy(g2);
+      }
+      await saveGame(g2);
+    };
+    return;
+  }
+
+  if(g.phase==='legPresident'){
+    if(iAmPres){
+      const hand=g.presHand||[];
+      body.innerHTML = `
+        <div class="folder" data-tab="Legislative Session">
+          <h1 class="title">Discard One</h1>
+          <p class="sub">You drew three. Discard one; the other two go to Chancellor ${esc(g.chancellor)}. Say whatever you like about them.</p>
+          <div class="policy-row">
+            ${hand.map((c,i)=>`<div class="pcard ${c}" data-i="${i}">${c==='lib'?'Liberal':'Fascist'}</div>`).join('')}
+          </div>
+          <p class="hint-dark">Tap the card you want to throw away.</p>
+        </div>`;
+      body.querySelectorAll('.pcard').forEach(el=>{
+        el.onclick = async ()=>{
+          const i=parseInt(el.dataset.i,10);
+          const g2=await dbGet(`games/${S.code}`);
+          if(!g2 || g2.phase!=='legPresident') return;
+          const h=g2.presHand.slice();
+          const [dropped]=h.splice(i,1);
+          g2.discard=g2.discard||[]; g2.discard.push(dropped);
+          g2.chanHand=h; g2.presHand=null; g2.phase='legChancellor';
+          await saveGame(g2);
+        };
+      });
+    } else {
+      body.innerHTML = waitingBlock('Legislative Session', `President ${esc(pres.name)} is discarding a policy.`,0,0);
+    }
+    return;
+  }
+
+  if(g.phase==='legChancellor'){
+    if(iAmChan){
+      const hand=g.chanHand||[];
+      const vetoOK = g.fasc>=5 && !g.vetoRequested;
+      body.innerHTML = `
+        <div class="folder" data-tab="Legislative Session">
+          <h1 class="title">Enact One</h1>
+          <p class="sub">The President passed you two. Discard one — the other becomes law.</p>
+          <div class="policy-row">
+            ${hand.map((c,i)=>`<div class="pcard ${c}" data-i="${i}">${c==='lib'?'Liberal':'Fascist'}</div>`).join('')}
+          </div>
+          <p class="hint-dark">Tap the card you want to <strong>discard</strong>. The other one is enacted.</p>
+          ${vetoOK?`<button class="btn btn-ghost" id="vetoBtn" style="margin-top:14px;border-color:#b7a97f;color:#54493a;">Propose Veto</button>`:''}
+        </div>`;
+      body.querySelectorAll('.pcard').forEach(el=>{
+        el.onclick = async ()=>{
+          const i=parseInt(el.dataset.i,10);
+          const g2=await dbGet(`games/${S.code}`);
+          if(!g2 || g2.phase!=='legChancellor') return;
+          const h=g2.chanHand.slice();
+          const [dropped]=h.splice(i,1);
+          g2.discard=g2.discard||[]; g2.discard.push(dropped);
+          const enacted=h[0];
+          g2.chanHand=null;
+          addLog(g2, `${g2.chancellor} enacts a ${enacted==='lib'?'Liberal':'Fascist'} policy.`);
+          enactPolicy(g2,enacted,false);
+          await saveGame(g2);
+        };
+      });
+      const vb=document.getElementById('vetoBtn');
+      if(vb) vb.onclick = async ()=>{
+        const g2=await dbGet(`games/${S.code}`);
+        if(!g2 || g2.phase!=='legChancellor') return;
+        g2.vetoRequested=true; g2.phase='veto';
+        addLog(g2, `${g2.chancellor} proposes a veto.`);
+        await saveGame(g2);
+      };
+    } else {
+      body.innerHTML = waitingBlock('Legislative Session', `Chancellor ${esc(g.chancellor)} is enacting a policy.`,0,0);
+    }
+    return;
+  }
+
+  if(g.phase==='veto'){
+    if(iAmPres){
+      body.innerHTML = `
+        <div class="folder" data-tab="Veto Proposed">
+          <h1 class="title">Veto?</h1>
+          <p class="sub">Chancellor ${esc(g.chancellor)} proposes discarding both policies. If you consent, the agenda is scrapped and the election tracker advances.</p>
+          <button class="btn btn-danger" id="vetoYes">Consent to Veto</button>
+          <button class="btn btn-ghost" id="vetoNo" style="border-color:#b7a97f;color:#54493a;">Refuse — Enact a Policy</button>
+        </div>`;
+      document.getElementById('vetoYes').onclick = async ()=>{
+        const g2=await dbGet(`games/${S.code}`);
+        if(!g2 || g2.phase!=='veto') return;
+        g2.discard=g2.discard||[];
+        (g2.chanHand||[]).forEach(c=>g2.discard.push(c));
+        g2.chanHand=null; g2.vetoRequested=false;
+        addLog(g2,'The veto was approved. The agenda is scrapped.');
+        g2.tracker++;
+        if(g2.tracker>=3){
+          ensureDeck(g2,1);
+          const top=g2.deck.shift();
+          addLog(g2, `Chaos — a ${top==='lib'?'Liberal':'Fascist'} policy is enacted from the deck.`);
+          g2.tracker=0; g2.prevPresident=null; g2.prevChancellor=null;
+          enactPolicy(g2,top,true);
+        } else {
+          advanceAfterPolicy(g2);
+        }
+        await saveGame(g2);
+      };
+      document.getElementById('vetoNo').onclick = async ()=>{
+        const g2=await dbGet(`games/${S.code}`);
+        if(!g2 || g2.phase!=='veto') return;
+        g2.vetoRequested=true; g2.phase='legChancellor';
+        addLog(g2,'The President refused the veto.');
+        await saveGame(g2);
+      };
+    } else {
+      body.innerHTML = waitingBlock('Veto Proposed', `President ${esc(pres.name)} is deciding whether to consent.`,0,0);
+    }
+    return;
+  }
+
+  if(g.phase==='power'){
+    const pw=g.pendingPower;
+    if(iAmPres){
+      if(pw==='peek'){
+        const cards=g.peek||[];
+        body.innerHTML = `
+          <div class="folder" data-tab="Policy Peek">
+            <h1 class="title">The Next Three</h1>
+            <p class="sub">Only you see these, in the order they will be drawn. Report them honestly or not.</p>
+            <div class="policy-row">
+              ${cards.map(c=>`<div class="pcard ${c}" style="cursor:default;">${c==='lib'?'Liberal':'Fascist'}</div>`).join('')}
+            </div>
+            <button class="btn btn-primary" id="pwDone">Done</button>
+          </div>`;
+        document.getElementById('pwDone').onclick = async ()=>{
+          const g2=await dbGet(`games/${S.code}`);
+          if(!g2 || g2.phase!=='power') return;
+          g2.peek=null; g2.pendingPower=null;
+          advanceAfterPolicy(g2);
+          await saveGame(g2);
+        };
+      } else if(pw==='investigate'){
+        const targets=alivePlayers(g).filter(p=>p.name!==pres.name && !(g.investigated||{})[safeKey(p.name)]);
+        body.innerHTML = `
+          <div class="folder" data-tab="Investigate Loyalty">
+            <h1 class="title">Investigate</h1>
+            <p class="sub">Choose a player. You alone see their party membership — which is not the same as their role.</p>
+            <select id="invSelect">${targets.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('')}</select>
+            <button class="btn btn-primary" id="invBtn">Investigate</button>
+          </div>`;
+        document.getElementById('invBtn').onclick = async ()=>{
+          const target=document.getElementById('invSelect').value;
+          const g2=await dbGet(`games/${S.code}`);
+          if(!g2 || g2.phase!=='power') return;
+          const tp=playerByName(g2,target);
+          g2.investigated=g2.investigated||{};
+          g2.investigated[safeKey(target)]=true;
+          g2.investigateResult={who:target,party:tp.party};
+          g2.phase='investigateResult';
+          addLog(g2, `${pres.name} investigates ${target}.`);
+          await saveGame(g2);
+        };
+      } else if(pw==='specialElection'){
+        const targets=alivePlayers(g).filter(p=>p.name!==pres.name);
+        body.innerHTML = `
+          <div class="folder" data-tab="Special Election">
+            <h1 class="title">Call a Special Election</h1>
+            <p class="sub">Choose the next President. Afterwards the order returns to normal from where it left off.</p>
+            <select id="seSelect">${targets.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('')}</select>
+            <button class="btn btn-primary" id="seBtn">Appoint</button>
+          </div>`;
+        document.getElementById('seBtn').onclick = async ()=>{
+          const target=document.getElementById('seSelect').value;
+          const g2=await dbGet(`games/${S.code}`);
+          if(!g2 || g2.phase!=='power') return;
+          g2.specialReturn=g2.presidentIndex;
+          g2.presidentIndex=g2.players.findIndex(p=>p.name===target);
+          g2.pendingPower=null; g2.round++;
+          addLog(g2, `${pres.name} calls a special election: ${target} becomes President.`);
+          beginNomination(g2);
+          await saveGame(g2);
+        };
+      } else if(pw==='execute'){
+        const targets=alivePlayers(g).filter(p=>p.name!==pres.name);
+        body.innerHTML = `
+          <div class="folder" data-tab="Execution">
+            <h1 class="title">Execute a Player</h1>
+            <p class="sub">They are out of the game and can no longer vote or hold office. If they were Hitler, the Liberals win at once.</p>
+            <select id="exSelect">${targets.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('')}</select>
+            <button class="btn btn-danger" id="exBtn">Execute</button>
+          </div>`;
+        document.getElementById('exBtn').onclick = async ()=>{
+          const target=document.getElementById('exSelect').value;
+          const g2=await dbGet(`games/${S.code}`);
+          if(!g2 || g2.phase!=='power') return;
+          const tp=playerByName(g2,target);
+          tp.alive=false;
+          addLog(g2, `${pres.name} executes ${target}.`);
+          if(tp.role==='hitler'){
+            g2.winner='liberal';
+            g2.winReason=`${target} was Hitler, and was executed.`;
+            g2.phase='gameOver';
+          } else {
+            g2.pendingPower=null;
+            advanceAfterPolicy(g2);
+          }
+          await saveGame(g2);
+        };
+      }
+    } else {
+      body.innerHTML = waitingBlock(POWER_LABEL[pw]||'Presidential Power',
+        `President ${esc(pres.name)} is using their power.`,0,0);
+    }
+    return;
+  }
+
+  if(g.phase==='investigateResult'){
+    const r=g.investigateResult||{};
+    if(iAmPres){
+      body.innerHTML = `
+        <div class="folder" data-tab="Investigation">
+          <h1 class="title">${esc(r.who||'')}</h1>
+          <p class="sub">Their party membership card reads:</p>
+          <div class="role-card ${r.party==='liberal'?'liberal':'fascist'}" style="margin-bottom:14px;">
+            <div class="role-eyebrow">Party Membership</div>
+            <div class="role-name">${r.party==='liberal'?'Liberal':'Fascist'}</div>
+          </div>
+          <p class="hint-dark">Hitler's membership card also reads Fascist. You may tell the table the truth, or not.</p>
+          <button class="btn btn-primary" id="invDone" style="margin-top:14px;">Done</button>
+        </div>`;
+      document.getElementById('invDone').onclick = async ()=>{
+        const g2=await dbGet(`games/${S.code}`);
+        if(!g2 || g2.phase!=='investigateResult') return;
+        g2.investigateResult=null; g2.pendingPower=null;
+        advanceAfterPolicy(g2);
+        await saveGame(g2);
+      };
+    } else {
+      body.innerHTML = waitingBlock('Investigation',
+        `President ${esc(pres.name)} is examining ${esc(r.who||'a player')}'s allegiance.`,0,0);
+    }
+    return;
+  }
+
+  body.innerHTML = waitingBlock('Please Wait','Synchronising with the table.',0,0);
+}
+
+function renderLog(g){
+  const items=(g.log||[]).slice(0,10);
+  document.getElementById('logWrap').innerHTML = items.length
+    ? items.map(l=>`<div class="log-item">${esc(l)}</div>`).join('')
+    : '<div class="log-item">Nothing yet.</div>';
+}
+
+async function submitVote(vote){
+  const overlay=document.getElementById('stampOverlay');
+  const word=document.getElementById('stampWord');
+  word.textContent = vote==='ja'?'JA':'NEIN';
+  word.style.color = vote==='ja'?'var(--crimson)':'var(--teal-light)';
+  word.classList.remove('animate'); void word.offsetWidth;
+  overlay.classList.add('show'); word.classList.add('animate');
+  try{ await dbPut(`games/${S.code}/votes/${safeKey(S.name)}`, vote); }
+  catch(e){ toast('Vote failed to send.'); }
+  setTimeout(()=>{ overlay.classList.remove('show'); tick(); },850);
+}
+
+async function renderLobby(){
+  const players=await dbGet(`rooms/${S.code}/players`);
+  const names=players?Object.keys(players):[];
+  const rows=names.map(n=>`<div class="prow"><span class="pname">${esc(n)}</span>${isMe(n)?'<span class="ptag you">You</span>':''}</div>`).join('');
+  document.getElementById('lobbyPlayers').innerHTML =
+    `<div class="players" style="margin-bottom:0;"><div class="players-title">Present (${names.length})</div>${rows||'<div class="log-item">Waiting…</div>'}</div>`;
+  const btn=document.getElementById('dealBtn'), hint=document.getElementById('lobbyHint');
+  if(names.length<5){
+    btn.disabled=true; btn.textContent=`Need 5 players (${names.length} here)`;
+    hint.textContent='Secret Hitler needs at least five players. Everyone should open this same link and enter the same room code.';
+  } else if(names.length>10){
+    btn.disabled=true; btn.textContent='Too many players (max 10)'; hint.textContent='';
+  } else {
+    btn.disabled=false; btn.textContent=`Deal Roles & Begin (${names.length} players)`;
+    const cfg=SETUP[names.length];
+    hint.textContent=`${cfg.lib} Liberals, ${cfg.fasc} Fascist${cfg.fasc>1?'s':''}, and Hitler.`;
+  }
+  btn.onclick = async ()=>{
+    const cur=await dbGet(`rooms/${S.code}/players`);
+    const ns=cur?Object.keys(cur):[];
+    if(ns.length<5||ns.length>10) return;
+    await saveGame(dealGame(ns));
+  };
+  showScreen('screen-lobby');
+}
+
+async function tick(){
+  if(!S.joined) return;
+  try{
+    const g=await dbGet(`games/${S.code}`);
+    if(!g){ await renderLobby(); return; }
+    g.players=g.players||[]; g.deck=g.deck||[]; g.discard=g.discard||[];
+    g.votes=g.votes||{}; g.investigated=g.investigated||{};
+    S.game=g;
+
+    if(!me(g)){
+      renderBoard(g);
+      document.getElementById('gameBody').innerHTML =
+        waitingBlock('Game in Progress','A game started without you. Wait for it to finish, or have the table deal again.',0,0);
+      renderLog(g); showScreen('screen-game');
+      return;
+    }
+
+    if(g.phase==='roleReveal'){
+      renderRoleReveal(g);
+      showScreen('screen-role');
+      if(g.players.every(p=>p.seen)){
+        const g2=await dbGet(`games/${S.code}`);
+        if(g2 && g2.phase==='roleReveal' && g2.players.every(p=>p.seen)){
+          beginNomination(g2);
+          addLog(g2, `${g2.players[g2.presidentIndex].name} is the first President.`);
+          await saveGame(g2);
+        }
+      }
+      return;
+    }
+
+    renderBoard(g); renderGame(g); renderLog(g);
+    showScreen('screen-game');
+  }catch(e){ console.error('tick',e); }
+}
+function startPolling(){
+  tick();
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer=setInterval(tick,1600);
+}
+
+document.getElementById('dbSaveBtn').onclick = async ()=>{
+  const url=document.getElementById('dbInput').value.trim().replace(/\/+$/,'');
+  if(!url.startsWith('http')){ toast('That does not look like a URL.'); return; }
+  try{
+    const r=await fetch(`${url}/connectiontest.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(Date.now())});
+    if(!r.ok) throw new Error();
+    try{ localStorage.setItem('sh_db_url',url); }catch(e){}
+    S.db=url; toast('Connected.'); showScreen('screen-join');
+  }catch(e){ toast('Could not write to that database.'); }
+};
+
+document.getElementById('joinBtn').onclick = async ()=>{
+  const name=document.getElementById('nameInput').value.trim();
+  const code=document.getElementById('codeInput').value.trim().toUpperCase();
+  if(!name||!code){ toast('Enter your name and a room code.'); return; }
+  const btn=document.getElementById('joinBtn');
+  btn.disabled=true; btn.textContent='Entering…';
+  try{
+    S.code=safeKey(code); S.name=name;
+    await dbPut(`rooms/${S.code}/players/${safeKey(name)}`, Date.now());
+    S.joined=true;
+    document.getElementById('hdrRoom').textContent=code;
+    document.getElementById('hdrRight').style.display='flex';
+    try{ localStorage.setItem('sh_name',name); }catch(e){}
+    startPolling();
+  }catch(e){ toast('Could not reach the database.'); }
+  finally{ btn.disabled=false; btn.textContent='Enter Room'; }
+};
+
+document.getElementById('leaveBtn').onclick = async ()=>{
+  if(pollTimer) clearInterval(pollTimer);
+  await dbDel(`rooms/${S.code}/players/${safeKey(S.name)}`);
+  S.joined=false;
+  document.getElementById('hdrRight').style.display='none';
+  showScreen('screen-join');
+};
+
+document.getElementById('roleAckBtn').onclick = async ()=>{
+  const g=await dbGet(`games/${S.code}`);
+  if(!g) return;
+  const idx=g.players.findIndex(p=>p.name===S.name);
+  if(idx>=0) await dbPut(`games/${S.code}/players/${idx}/seen`, true);
+  await tick();
+};
+
+(function init(){
+  const url=getDbUrl();
+  if(url){
+    S.db=url;
+    try{ const n=localStorage.getItem('sh_name'); if(n) document.getElementById('nameInput').value=n; }catch(e){}
+    showScreen('screen-join');
+  } else {
+    showScreen('screen-setup');
+  }
+})();
+</script>
+</body>
+</html>
