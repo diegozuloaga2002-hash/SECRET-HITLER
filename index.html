@@ -301,7 +301,7 @@ function getDbUrl(){
   try{ const s = localStorage.getItem('sh_db_url'); return s ? s.replace(/\/+$/,'') : ''; }catch(e){ return ''; }
 }
 
-const S = { name:'', code:'', joined:false, db:'', game:null };
+const S = { name:'', code:'', joined:false, db:'', game:null, lastRenderKey:'' };
 let pollTimer = null;
 
 async function dbGet(path){
@@ -569,11 +569,32 @@ function waitingBlock(title, sub, count, total){
     <h2>${title}</h2><p>${sub}</p>${prog}</div>`;
 }
 
+// A signature of everything the game body actually depends on. If it hasn't
+// changed we leave the DOM alone, so open dropdowns keep the user's choice
+// instead of being rebuilt on every poll.
+function renderKey(g){
+  return [
+    g.phase, g.presidentIndex, g.nominee, g.chancellor,
+    g.lib, g.fasc, g.tracker, g.round,
+    Object.keys(g.votes||{}).length,
+    (g.presHand||[]).join(','), (g.chanHand||[]).join(','),
+    (g.peek||[]).join(','), g.pendingPower,
+    g.investigateResult ? g.investigateResult.who : '',
+    g.winner, g.chaosPolicy,
+    g.players.map(p=>p.alive?1:0).join(''),
+    g.prevPresident, g.prevChancellor
+  ].join('|');
+}
+
 function renderGame(g){
   const body=document.getElementById('gameBody');
   const m=me(g), pres=currentPresident(g);
   const iAmPres = m && pres.name===m.name;
   const iAmChan = m && g.chancellor===m.name;
+
+  const key = renderKey(g);
+  if(key === S.lastRenderKey) return;
+  S.lastRenderKey = key;
 
   if(g.phase==='gameOver'){
     const cls = g.winner==='liberal'?'lib':'fasc';
@@ -651,15 +672,6 @@ function renderGame(g){
     } else {
       body.innerHTML = waitingBlock('Ballot Sealed',
         `${esc(pres.name)} / ${esc(g.nominee)} — waiting on the table.`, voted, voters.length);
-      if(voted>=voters.length){
-        (async ()=>{
-          const g2=await dbGet(`games/${S.code}`);
-          if(!g2 || g2.phase!=='election') return;
-          if(Object.keys(g2.votes||{}).length < alivePlayers(g2).length) return;
-          resolveElection(g2);
-          await saveGame(g2);
-        })();
-      }
     }
     return;
   }
@@ -998,6 +1010,7 @@ async function tick(){
     if(g.phase==='roleReveal'){
       renderRoleReveal(g);
       showScreen('screen-role');
+      S.lastRenderKey='';
       if(g.players.every(p=>p.seen)){
         const g2=await dbGet(`games/${S.code}`);
         if(g2 && g2.phase==='roleReveal' && g2.players.every(p=>p.seen)){
@@ -1011,6 +1024,16 @@ async function tick(){
 
     renderBoard(g); renderGame(g); renderLog(g);
     showScreen('screen-game');
+
+    // once every living player has voted, whichever client notices first resolves it
+    if(g.phase==='election' && Object.keys(g.votes||{}).length >= alivePlayers(g).length){
+      const g2=await dbGet(`games/${S.code}`);
+      if(g2 && g2.phase==='election' && Object.keys(g2.votes||{}).length >= alivePlayers(g2).length){
+        resolveElection(g2);
+        await saveGame(g2);
+        await tick();
+      }
+    }
   }catch(e){ console.error('tick',e); }
 }
 function startPolling(){
