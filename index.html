@@ -39,6 +39,18 @@
     font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--void-2);
     border:1px solid rgba(236,227,203,0.18);color:var(--paper-2);padding:5px 8px;border-radius:3px;
   }
+  .role-badge{
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.11em;text-transform:uppercase;
+    font-weight:600;padding:5px 8px;border-radius:3px;border:1px solid;cursor:pointer;
+  }
+  .role-badge.hidden-role{
+    background:var(--void-2);border-color:rgba(236,227,203,0.18);color:var(--ash);
+  }
+  .role-badge.hidden-role::before{content:'▸ ';}
+  .role-badge.liberal{background:rgba(46,74,82,0.35);border-color:var(--teal-light);color:var(--teal-light);}
+  .role-badge.fascist{background:rgba(163,31,34,0.35);border-color:#e08a8c;color:#f0a5a7;}
+  .role-badge.hitler{background:rgba(199,162,51,0.25);border-color:var(--brass);color:var(--brass);}
+  .role-badge.dead{opacity:0.45;}
   .leave-link{
     font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
     color:var(--ash);background:none;border:none;cursor:pointer;padding:4px;
@@ -203,6 +215,17 @@
   .rrole.fasc{color:#e08a8c;}
   .rrole.hit{color:var(--brass);}
 
+  .allies{
+    margin-top:16px;background:rgba(163,31,34,0.12);border:1px solid rgba(224,138,140,0.3);
+    border-radius:4px;padding:10px 12px;
+  }
+  .allies summary{
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;
+    color:#e08a8c;cursor:pointer;list-style:none;
+  }
+  .allies summary::-webkit-details-marker{display:none;}
+  .allies-body{font-size:14px;color:var(--paper-2);margin-top:8px;}
+
   .log{margin-top:20px;}
   .log-title{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:var(--brass);margin-bottom:8px;}
   .log-item{font-size:12.5px;color:var(--ash);padding:5px 0;border-bottom:1px solid rgba(236,227,203,0.06);line-height:1.45;}
@@ -229,6 +252,7 @@
 <header class="app-header">
   <div class="brand">Secret <span>Hitler</span></div>
   <div class="hdr-right" id="hdrRight" style="display:none;">
+    <button class="role-badge hidden-role" id="hdrRole" style="display:none;">Role</button>
     <span class="badge" id="hdrRoom"></span>
     <button class="leave-link" id="leaveBtn">Leave</button>
   </div>
@@ -282,6 +306,7 @@
   <section class="screen" id="screen-game">
     <div id="boardWrap"></div>
     <div id="gameBody"></div>
+    <div id="alliesWrap"></div>
     <div class="log">
       <div class="log-title">Record of Proceedings</div>
       <div id="logWrap"></div>
@@ -301,7 +326,7 @@ function getDbUrl(){
   try{ const s = localStorage.getItem('sh_db_url'); return s ? s.replace(/\/+$/,'') : ''; }catch(e){ return ''; }
 }
 
-const S = { name:'', code:'', joined:false, db:'', game:null, lastRenderKey:'' };
+const S = { name:'', code:'', joined:false, db:'', game:null, lastRenderKey:'', roleShown:false, alliesKey:'' };
 let pollTimer = null;
 
 async function dbGet(path){
@@ -945,6 +970,24 @@ function renderGame(g){
   body.innerHTML = waitingBlock('Please Wait','Synchronising with the table.',0,0);
 }
 
+function renderAllies(g){
+  const m=me(g);
+  const wrap=document.getElementById('alliesWrap');
+  if(!m || m.role==='liberal'){ wrap.innerHTML=''; return; }
+  const n=g.players.length;
+  let list='';
+  if(m.role==='fascist'){
+    list = g.players.filter(p=>p.name!==m.name && (p.role==='fascist'||p.role==='hitler'))
+      .map(p=>`${esc(p.name)}${p.role==='hitler'?' (Hitler)':''}`).join(', ');
+  } else if(m.role==='hitler' && n<=6){
+    list = g.players.filter(p=>p.role==='fascist').map(p=>esc(p.name)).join(', ');
+  }
+  if(!list){ wrap.innerHTML=''; S.alliesKey=''; return; }
+  if(S.alliesKey === list) return;
+  S.alliesKey = list;
+  wrap.innerHTML = `<details class="allies"><summary>Your side (tap to reveal)</summary><div class="allies-body">${list}</div></details>`;
+}
+
 function renderLog(g){
   const items=(g.log||[]).slice(0,10);
   document.getElementById('logWrap').innerHTML = items.length
@@ -990,14 +1033,51 @@ async function renderLobby(){
   showScreen('screen-lobby');
 }
 
+let roleHideTimer = null;
+
+function updateRoleBadge(g){
+  const el=document.getElementById('hdrRole');
+  const m = g ? me(g) : null;
+  if(!m || !m.role){
+    el.style.display='none';
+    S.roleShown=false;
+    if(roleHideTimer){ clearTimeout(roleHideTimer); roleHideTimer=null; }
+    return;
+  }
+  el.style.display='inline-block';
+  if(S.roleShown){
+    const label = m.role==='hitler'?'Hitler':(m.role==='fascist'?'Fascist':'Liberal');
+    el.textContent = label;
+    el.className = 'role-badge ' + m.role + (m.alive?'':' dead');
+  } else {
+    el.textContent = 'Role';
+    el.className = 'role-badge hidden-role';
+  }
+}
+
+function toggleRoleBadge(){
+  if(roleHideTimer){ clearTimeout(roleHideTimer); roleHideTimer=null; }
+  S.roleShown = !S.roleShown;
+  updateRoleBadge(S.game);
+  if(S.roleShown){
+    // auto-hide again so it can't be left exposed on the table
+    roleHideTimer = setTimeout(()=>{
+      S.roleShown=false;
+      updateRoleBadge(S.game);
+      roleHideTimer=null;
+    }, 4000);
+  }
+}
+
 async function tick(){
   if(!S.joined) return;
   try{
     const g=await dbGet(`games/${S.code}`);
-    if(!g){ await renderLobby(); return; }
+    if(!g){ updateRoleBadge(null); await renderLobby(); return; }
     g.players=g.players||[]; g.deck=g.deck||[]; g.discard=g.discard||[];
     g.votes=g.votes||{}; g.investigated=g.investigated||{};
     S.game=g;
+    updateRoleBadge(g);
 
     if(!me(g)){
       renderBoard(g);
@@ -1022,7 +1102,7 @@ async function tick(){
       return;
     }
 
-    renderBoard(g); renderGame(g); renderLog(g);
+    renderBoard(g); renderGame(g); renderAllies(g); renderLog(g);
     showScreen('screen-game');
 
     // once every living player has voted, whichever client notices first resolves it
@@ -1078,6 +1158,8 @@ document.getElementById('leaveBtn').onclick = async ()=>{
   document.getElementById('hdrRight').style.display='none';
   showScreen('screen-join');
 };
+
+document.getElementById('hdrRole').onclick = toggleRoleBadge;
 
 document.getElementById('roleAckBtn').onclick = async ()=>{
   const g=await dbGet(`games/${S.code}`);
