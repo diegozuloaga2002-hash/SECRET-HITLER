@@ -236,6 +236,128 @@
   .allies summary::-webkit-details-marker{display:none;}
   .allies-body{font-size:14px;color:var(--paper-2);margin-top:8px;}
 
+  /* ===== Cinematic interstitials ===== */
+  .cinema{
+    position:fixed;inset:0;z-index:80;display:none;
+    align-items:center;justify-content:center;flex-direction:column;
+    padding:30px;text-align:center;cursor:pointer;
+  }
+  .cinema.show{display:flex;}
+  .cinema-bg{position:absolute;inset:0;}
+  .cinema.policy-fasc .cinema-bg{
+    background:
+      radial-gradient(circle at 50% 42%, rgba(163,31,34,0.55), rgba(20,17,15,0.97) 62%),
+      var(--void);
+  }
+  .cinema.policy-lib .cinema-bg{
+    background:
+      radial-gradient(circle at 50% 42%, rgba(46,74,82,0.6), rgba(20,17,15,0.97) 62%),
+      var(--void);
+  }
+  .cinema.neutral .cinema-bg{
+    background:radial-gradient(circle at 50% 42%, rgba(199,162,51,0.22), rgba(20,17,15,0.98) 64%),var(--void);
+  }
+  .cinema-bg::after{
+    content:'';position:absolute;inset:0;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 4px);
+  }
+  .cinema-inner{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;}
+
+  .cinema-eyebrow{
+    font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:0.34em;text-transform:uppercase;
+    color:var(--brass);opacity:0;animation:eyebrowIn .5s ease .12s forwards;
+  }
+  .cinema-title{
+    font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;
+    font-size:clamp(34px,11vw,58px);line-height:0.95;letter-spacing:0.02em;
+    padding:14px 26px;border:5px solid currentColor;border-radius:6px;
+    opacity:0;transform:scale(2.6) rotate(-9deg);
+    animation:slamIn .5s cubic-bezier(.15,1.5,.4,1) .18s forwards;
+  }
+  .cinema.policy-fasc .cinema-title{color:#f0a5a7;box-shadow:0 0 44px rgba(163,31,34,0.6);}
+  .cinema.policy-lib .cinema-title{color:#9fd4df;box-shadow:0 0 44px rgba(46,74,82,0.7);}
+  .cinema.neutral .cinema-title{color:var(--brass);box-shadow:0 0 40px rgba(199,162,51,0.35);border-width:3px;}
+  .cinema-sub{
+    font-size:15px;color:var(--paper-2);max-width:330px;line-height:1.5;
+    opacity:0;animation:subIn .45s ease .52s forwards;
+  }
+  .cinema-tally{display:flex;gap:26px;opacity:0;animation:subIn .45s ease .42s forwards;}
+  .cinema-tally .t{display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .cinema-tally .tnum{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(40px,14vw,66px);line-height:1;}
+  .cinema-tally .tlbl{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);}
+  .cinema-tally .ja .tnum{color:#e08a8c;}
+  .cinema-tally .nein .tnum{color:#9fd4df;}
+  .cinema-dismiss{
+    position:absolute;bottom:28px;left:0;right:0;
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.2em;
+    text-transform:uppercase;color:#5f594d;opacity:0;animation:subIn .4s ease 1s forwards;
+  }
+  @keyframes slamIn{
+    0%{opacity:0;transform:scale(2.6) rotate(-9deg);}
+    58%{opacity:1;transform:scale(0.93) rotate(-2.5deg);}
+    78%{transform:scale(1.05) rotate(-1deg);}
+    100%{opacity:1;transform:scale(1) rotate(-1.5deg);}
+  }
+  @keyframes eyebrowIn{from{opacity:0;letter-spacing:0.5em;}to{opacity:1;letter-spacing:0.34em;}}
+  @keyframes subIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ===== Office sash ===== */
+  .office-banner{
+    position:relative;overflow:hidden;border-radius:5px;padding:16px 18px;margin-bottom:16px;
+    border:2px solid;display:flex;align-items:center;gap:14px;
+  }
+  .office-banner.president{
+    background:linear-gradient(100deg, rgba(199,162,51,0.28), rgba(199,162,51,0.08));
+    border-color:var(--brass);
+  }
+  .office-banner.chancellor{
+    background:linear-gradient(100deg, rgba(236,227,203,0.2), rgba(236,227,203,0.05));
+    border-color:var(--paper-2);
+  }
+  .office-banner::after{
+    content:'';position:absolute;top:0;bottom:0;left:-60%;width:45%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent);
+    animation:sheen 3.4s ease-in-out infinite;
+  }
+  @keyframes sheen{0%{left:-60%;}55%{left:130%;}100%{left:130%;}}
+  .office-seal{
+    width:44px;height:44px;flex:0 0 44px;border-radius:50%;border:2px solid;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .office-banner.president .office-seal{border-color:var(--brass);}
+  .office-banner.chancellor .office-seal{border-color:var(--paper-2);}
+  .office-seal svg{width:22px;height:22px;}
+  .office-banner.president .office-seal svg{fill:var(--brass);}
+  .office-banner.chancellor .office-seal svg{fill:var(--paper-2);}
+  .office-text{display:flex;flex-direction:column;gap:2px;}
+  .office-eyebrow{
+    font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:0.22em;
+    text-transform:uppercase;color:var(--ash);
+  }
+  .office-title{
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:24px;
+    text-transform:uppercase;letter-spacing:0.04em;line-height:1;
+  }
+  .office-banner.president .office-title{color:var(--brass);}
+  .office-banner.chancellor .office-title{color:var(--paper);}
+
+  /* ===== Turn indicator for everyone else ===== */
+  .turn-strip{
+    display:flex;align-items:center;gap:10px;background:var(--void-2);
+    border:1px solid rgba(236,227,203,0.12);border-left:3px solid var(--brass);
+    border-radius:4px;padding:11px 13px;margin-bottom:16px;
+  }
+  .turn-strip .ts-label{
+    font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:0.18em;
+    text-transform:uppercase;color:var(--ash);
+  }
+  .turn-strip .ts-name{font-family:'Oswald',sans-serif;font-size:16px;text-transform:uppercase;letter-spacing:0.03em;color:var(--paper);}
+
+  @media (prefers-reduced-motion: reduce){
+    .cinema-title,.cinema-eyebrow,.cinema-sub,.cinema-tally,.cinema-dismiss,
+    .stamp-word,.office-banner::after,.seal{animation:none !important;opacity:1 !important;transform:none !important;}
+  }
+
   .log{margin-top:20px;}
   .log-title{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:var(--brass);margin-bottom:8px;}
   .log-item{font-size:12.5px;color:var(--ash);padding:5px 0;border-bottom:1px solid rgba(236,227,203,0.06);line-height:1.45;}
@@ -325,6 +447,11 @@
 
 </main>
 
+<div class="cinema" id="cinema">
+  <div class="cinema-bg"></div>
+  <div class="cinema-inner" id="cinemaInner"></div>
+  <div class="cinema-dismiss">Tap to continue</div>
+</div>
 <div class="stamp-overlay" id="stampOverlay"><div class="stamp-word" id="stampWord">JA</div></div>
 <div class="toast" id="toast"></div>
 
@@ -336,7 +463,7 @@ function getDbUrl(){
   try{ const s = localStorage.getItem('sh_db_url'); return s ? s.replace(/\/+$/,'') : ''; }catch(e){ return ''; }
 }
 
-const S = { name:'', code:'', joined:false, db:'', game:null, lastRenderKey:'', roleShown:false, alliesKey:'' };
+const S = { name:'', code:'', joined:false, db:'', game:null, lastRenderKey:'', roleShown:false, alliesKey:'', prev:null, cinemaQueue:[], cinemaActive:false };
 let pollTimer = null;
 
 async function dbGet(path){
@@ -618,6 +745,140 @@ function waitingBlock(title, sub, count, total){
 // A signature of everything the game body actually depends on. If it hasn't
 // changed we leave the DOM alone, so open dropdowns keep the user's choice
 // instead of being rebuilt on every poll.
+// ===== Cinematic interstitials =====
+// Each phone detects state changes locally by comparing the incoming game to the
+// last one it saw, so the whole table gets the same moment at the same time.
+let cinemaTimer = null;
+
+function playCinema(item){
+  const el=document.getElementById('cinema');
+  const inner=document.getElementById('cinemaInner');
+  el.className = 'cinema show ' + item.tone;
+  inner.innerHTML = item.html;
+  S.cinemaActive = true;
+  if(cinemaTimer) clearTimeout(cinemaTimer);
+  cinemaTimer = setTimeout(closeCinema, item.ms || 2600);
+}
+function closeCinema(){
+  if(cinemaTimer){ clearTimeout(cinemaTimer); cinemaTimer=null; }
+  document.getElementById('cinema').className='cinema';
+  S.cinemaActive = false;
+  if(S.cinemaQueue.length) playCinema(S.cinemaQueue.shift());
+}
+function queueCinema(item){
+  if(S.cinemaActive || S.cinemaQueue.length) S.cinemaQueue.push(item);
+  else playCinema(item);
+}
+
+function cinemaPolicy(type){
+  const fasc = type==='fasc';
+  return {
+    tone: fasc ? 'policy-fasc' : 'policy-lib',
+    ms: 2700,
+    html: `<div class="cinema-eyebrow">A policy becomes law</div>
+           <div class="cinema-title">${fasc?'Fascist':'Liberal'}</div>
+           <div class="cinema-sub">${fasc
+             ? 'The Fascists advance. One step closer to seizing the state.'
+             : 'The Liberals hold the line.'}</div>`
+  };
+}
+function cinemaTally(ja, nein, passed, pres, chan){
+  return {
+    tone: passed ? 'policy-lib' : 'policy-fasc',
+    ms: 2900,
+    html: `<div class="cinema-eyebrow">The chamber has voted</div>
+           <div class="cinema-title">${passed?'Elected':'Rejected'}</div>
+           <div class="cinema-tally">
+             <div class="t ja"><div class="tnum">${ja}</div><div class="tlbl">Ja</div></div>
+             <div class="t nein"><div class="tnum">${nein}</div><div class="tlbl">Nein</div></div>
+           </div>
+           <div class="cinema-sub">${esc(pres)} &amp; ${esc(chan)}</div>`
+  };
+}
+function cinemaRound(n, presName, youArePres){
+  return {
+    tone:'neutral', ms:2400,
+    html: `<div class="cinema-eyebrow">Round ${n}</div>
+           <div class="cinema-title">${youArePres?'You Preside':'New Session'}</div>
+           <div class="cinema-sub">${youArePres
+             ? 'You are President. Nominate a Chancellor.'
+             : esc(presName) + ' takes the presidency.'}</div>`
+  };
+}
+function cinemaWin(g){
+  const lib = g.winner==='liberal';
+  return {
+    tone: lib?'policy-lib':'policy-fasc', ms:3400,
+    html: `<div class="cinema-eyebrow">The game is decided</div>
+           <div class="cinema-title">${lib?'Liberals Win':'Fascists Win'}</div>
+           <div class="cinema-sub">${esc(g.winReason||'')}</div>`
+  };
+}
+function cinemaExecution(name){
+  return {
+    tone:'policy-fasc', ms:2500,
+    html: `<div class="cinema-eyebrow">By presidential order</div>
+           <div class="cinema-title">Executed</div>
+           <div class="cinema-sub">${esc(name)} is removed from the chamber.</div>`
+  };
+}
+
+function detectMoments(g){
+  const prev = S.prev;
+  S.prev = {
+    lib:g.lib, fasc:g.fasc, round:g.round, phase:g.phase, winner:g.winner,
+    dead:g.players.filter(p=>!p.alive).map(p=>p.name).join(','),
+    tally:g.lastTally?`${g.lastTally.ja}-${g.lastTally.nein}`:''
+  };
+  if(!prev) return;                    // first sight of this game: no replay
+  if(prev.winner) return;              // already finished
+
+  const m = me(g);
+
+  // election resolved
+  if(prev.phase==='election' && g.phase!=='election' && g.lastTally){
+    const passed = g.phase==='legPresident' || (g.chancellor && g.phase!=='electionResult');
+    queueCinema(cinemaTally(g.lastTally.ja, g.lastTally.nein, passed,
+      currentPresident(g).name, g.nominee||g.chancellor||''));
+  }
+  // a policy was enacted
+  if(g.lib>prev.lib) queueCinema(cinemaPolicy('lib'));
+  if(g.fasc>prev.fasc) queueCinema(cinemaPolicy('fasc'));
+
+  // someone was executed
+  const nowDead=g.players.filter(p=>!p.alive).map(p=>p.name);
+  const wasDead=prev.dead?prev.dead.split(','):[];
+  nowDead.filter(n=>!wasDead.includes(n)).forEach(n=>queueCinema(cinemaExecution(n)));
+
+  // new round beginning
+  if(g.round>prev.round && g.phase==='nomination' && !g.winner){
+    queueCinema(cinemaRound(g.round, currentPresident(g).name,
+      m && currentPresident(g).name===m.name));
+  }
+  // game over
+  if(g.winner && !prev.winner) queueCinema(cinemaWin(g));
+}
+
+const SEAL_SVG = `<svg viewBox="0 0 24 24"><path d="M12 1l3.5 2 4 .5.5 4L22 11l-2 3.5.5 4-4 .5L13 22l-1-1-1 1-3.5-3-4-.5.5-4L2 11l2-3.5-.5-4 4-.5L11 1z"/></svg>`;
+
+function officeBanner(kind){
+  const title = kind==='president' ? 'President' : 'Chancellor';
+  const eyebrow = kind==='president' ? 'The chamber looks to you' : 'You have been entrusted';
+  return `<div class="office-banner ${kind}">
+    <div class="office-seal">${SEAL_SVG}</div>
+    <div class="office-text">
+      <div class="office-eyebrow">${eyebrow}</div>
+      <div class="office-title">${title}</div>
+    </div>
+  </div>`;
+}
+function turnStrip(label, name){
+  return `<div class="turn-strip">
+    <span class="ts-label">${label}</span>
+    <span class="ts-name">${esc(name)}</span>
+  </div>`;
+}
+
 function renderKey(g){
   return [
     g.phase, g.presidentIndex, g.nominee, g.chancellor,
@@ -673,10 +934,10 @@ function renderGame(g){
   if(g.phase==='nomination'){
     if(iAmPres){
       const elig=eligibleChancellors(g);
-      body.innerHTML = `
+      body.innerHTML = officeBanner('president') + `
         <div class="folder" data-tab="Round ${g.round}">
           <h1 class="title">Nominate a Chancellor</h1>
-          <p class="sub">You are President. Choose who governs with you — the table then votes.</p>
+          <p class="sub">Choose who governs with you — the table then votes.</p>
           <label class="field-label">Eligible candidates</label>
           <select id="nomSelect">${elig.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('')}</select>
           <button class="btn btn-primary" id="nomBtn">Put to the Vote</button>
@@ -690,7 +951,8 @@ function renderGame(g){
         await saveGame(g2);
       };
     } else {
-      body.innerHTML = waitingBlock('Nomination in Progress', `${esc(pres.name)} is choosing a Chancellor.`,0,0);
+      body.innerHTML = turnStrip('Presiding', pres.name) +
+        waitingBlock('Nomination in Progress', `${esc(pres.name)} is choosing a Chancellor.`,0,0);
     }
     return;
   }
@@ -753,7 +1015,7 @@ function renderGame(g){
   if(g.phase==='legPresident'){
     if(iAmPres){
       const hand=g.presHand||[];
-      body.innerHTML = `
+      body.innerHTML = officeBanner('president') + `
         <div class="folder" data-tab="Legislative Session">
           <h1 class="title">Discard One</h1>
           <p class="sub">You drew three. Discard one; the other two go to Chancellor ${esc(g.chancellor)}. Say whatever you like about them.</p>
@@ -784,7 +1046,7 @@ function renderGame(g){
     if(iAmChan){
       const hand=g.chanHand||[];
       const vetoOK = g.fasc>=5 && !g.vetoRequested;
-      body.innerHTML = `
+      body.innerHTML = officeBanner('chancellor') + `
         <div class="folder" data-tab="Legislative Session">
           <h1 class="title">Enact One</h1>
           <p class="sub">The President passed you two. Discard one — the other becomes law.</p>
@@ -1099,6 +1361,7 @@ async function tick(){
     g.votes=g.votes||{}; g.investigated=g.investigated||{};
     S.game=g;
     updateRoleBadge(g);
+    detectMoments(g);
 
     if(!me(g)){
       renderBoard(g);
@@ -1179,6 +1442,8 @@ document.getElementById('leaveBtn').onclick = async ()=>{
   document.getElementById('hdrRight').style.display='none';
   showScreen('screen-join');
 };
+
+document.getElementById('cinema').onclick = closeCinema;
 
 document.getElementById('hdrRole').onclick = toggleRoleBadge;
 
