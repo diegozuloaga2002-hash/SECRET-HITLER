@@ -133,6 +133,11 @@
   .prow{display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid rgba(236,227,203,0.06);font-size:14px;}
   .prow:last-child{border-bottom:none;}
   .prow.dead{opacity:0.4;text-decoration:line-through;}
+  .pchip{
+    width:22px;height:22px;flex:0 0 22px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:12px;line-height:1;box-shadow:0 0 0 1px rgba(236,227,203,0.25);
+  }
   .prow .pname{flex:1;}
   .ptag{font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:0.09em;text-transform:uppercase;padding:3px 6px;border-radius:2px;}
   .ptag.pres{background:var(--brass);color:var(--ink);}
@@ -358,6 +363,62 @@
     .stamp-word,.office-banner::after,.seal{animation:none !important;opacity:1 !important;transform:none !important;}
   }
 
+  /* ===== Lobby delegates ===== */
+  .delegates-head{
+    display:flex;align-items:baseline;gap:8px;
+    padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid rgba(33,28,21,0.14);
+  }
+  .delegates-count{
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:26px;line-height:1;color:var(--crimson);
+  }
+  .delegates-label{
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.16em;
+    text-transform:uppercase;color:#6b5e49;
+  }
+  .delegates{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));
+    gap:14px 10px;
+  }
+  .delegate{
+    display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;
+    opacity:0;animation:delegateIn .42s cubic-bezier(.2,1.1,.4,1) forwards;
+  }
+  @keyframes delegateIn{
+    from{opacity:0;transform:translateY(10px) scale(.85);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+  .medallion{
+    width:56px;height:56px;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(circle at 50% 38%, rgba(255,255,255,0.5), transparent 60%),
+      var(--ink,#8a7a55);
+    border-radius:50%;
+    box-shadow:0 0 0 2px #F6F0DC, 0 0 0 3.5px var(--ink,#8a7a55), 0 4px 10px rgba(0,0,0,0.28);
+  }
+  .medallion::after{
+    content:'';position:absolute;inset:5px;border-radius:50%;
+    border:1px dashed rgba(255,255,255,0.32);
+  }
+  .creature{font-size:27px;line-height:1;filter:saturate(1.05);}
+  .delegate.ghost .medallion{
+    background:transparent;box-shadow:none;
+    border:2px dashed rgba(33,28,21,0.22);
+  }
+  .delegate.ghost .creature{font-size:20px;color:#a3987f;font-family:'Oswald',sans-serif;font-weight:600;}
+  .delegate.ghost{opacity:.5;animation:none;}
+  .delegate.ghost .delegate-name,.delegate.ghost .delegate-role{color:#a3987f;}
+  .delegate-name{
+    font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.04em;color:var(--ink,#211C15);
+    max-width:82px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .delegate-role{font-size:10px;color:#7d7059;letter-spacing:0.03em;}
+  .delegate.is-you .medallion{
+    box-shadow:0 0 0 2px #F6F0DC, 0 0 0 4px var(--crimson), 0 4px 12px rgba(163,31,34,0.4);
+  }
+  .delegate.is-you .delegate-role{color:var(--crimson);font-weight:700;}
+
   .log{margin-top:20px;}
   .log-title{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:var(--brass);margin-bottom:8px;}
   .log-item{font-size:12.5px;color:var(--ash);padding:5px 0;border-bottom:1px solid rgba(236,227,203,0.06);line-height:1.45;}
@@ -463,7 +524,7 @@ function getDbUrl(){
   try{ const s = localStorage.getItem('sh_db_url'); return s ? s.replace(/\/+$/,'') : ''; }catch(e){ return ''; }
 }
 
-const S = { name:'', code:'', joined:false, db:'', game:null, lastRenderKey:'', roleShown:false, alliesKey:'', prev:null, cinemaQueue:[], cinemaActive:false };
+const S = { name:'', code:'', joined:false, db:'', game:null, lastRenderKey:'', roleShown:false, alliesKey:'', prev:null, cinemaQueue:[], cinemaActive:false, rosterKey:'' };
 let pollTimer = null;
 
 async function dbGet(path){
@@ -678,6 +739,7 @@ function renderBoard(g){
 
 function renderPlayers(g){
   const pres=currentPresident(g);
+  const cmap=creaturesFor(g.players.map(p=>p.name));
   const rows=g.players.map(p=>{
     let tags='';
     if(p.name===pres.name) tags+='<span class="ptag pres">Pres</span>';
@@ -685,7 +747,8 @@ function renderPlayers(g){
     else if(g.prevChancellor===p.name) tags+='<span class="ptag prev">Prev Chan</span>';
     if(g.prevPresident===p.name && g.chancellor!==p.name && p.name!==pres.name) tags+='<span class="ptag prev">Prev Pres</span>';
     if(isMe(p.name)) tags+='<span class="ptag you">You</span>';
-    return `<div class="prow ${p.alive?'':'dead'}"><span class="pname">${esc(p.name)}</span>${tags}</div>`;
+    const c=cmap[p.name]||CREATURES[0];
+    return `<div class="prow ${p.alive?'':'dead'}"><span class="pchip" style="background:${c.ink};">${c.emoji}</span><span class="pname">${esc(p.name)}</span>${tags}</div>`;
   }).join('');
   return `<div class="players"><div class="players-title">The Table</div>${rows}</div>`;
 }
@@ -1290,12 +1353,82 @@ async function submitVote(vote){
   setTimeout(()=>{ overlay.classList.remove('show'); tick(); },850);
 }
 
+// ===== Lobby avatars =====
+// Each player gets a stable animal + colour derived from their name, so every
+// phone at the table draws the same person the same way.
+const CREATURES = [
+  {emoji:'🦊', name:'Fox',      ink:'#C8622F'},
+  {emoji:'🦉', name:'Owl',      ink:'#8A6E4B'},
+  {emoji:'🐺', name:'Wolf',     ink:'#7C8794'},
+  {emoji:'🦅', name:'Eagle',    ink:'#A8813C'},
+  {emoji:'🐍', name:'Serpent',  ink:'#5E8C4A'},
+  {emoji:'🦁', name:'Lion',     ink:'#C79A2E'},
+  {emoji:'🐗', name:'Boar',     ink:'#8A5A46'},
+  {emoji:'🦌', name:'Stag',     ink:'#9A7346'},
+  {emoji:'🐻', name:'Bear',     ink:'#7A5B3E'},
+  {emoji:'🦇', name:'Bat',      ink:'#6E5A78'},
+  {emoji:'🐊', name:'Crocodile',ink:'#5F7A4B'},
+  {emoji:'🦈', name:'Shark',    ink:'#5B7E8C'},
+  {emoji:'🐈‍⬛', name:'Cat',    ink:'#6B6560'},
+  {emoji:'🦡', name:'Badger',   ink:'#77726A'},
+  {emoji:'🐇', name:'Hare',     ink:'#A08B70'},
+  {emoji:'🦂', name:'Scorpion', ink:'#9C4E3C'}
+];
+function hashName(s){
+  let h=2166136261;
+  for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); }
+  return Math.abs(h|0);
+}
+// Assign each player a DIFFERENT creature. Deterministic: we sort the roster so
+// every phone runs the same assignment in the same order and agrees on the result.
+function assignCreatures(names){
+  const sorted=names.slice().sort();
+  const taken=new Array(CREATURES.length).fill(false);
+  const map={};
+  sorted.forEach(n=>{
+    let i=hashName(n)%CREATURES.length;
+    for(let k=0;k<CREATURES.length;k++){
+      const j=(i+k)%CREATURES.length;
+      if(!taken[j]){ taken[j]=true; map[n]=CREATURES[j]; return; }
+    }
+    map[n]=CREATURES[i];   // more players than creatures: fall back
+  });
+  return map;
+}
+function creaturesFor(names){
+  const key=names.slice().sort().join('|');
+  if(S.creatureKey!==key){ S.creatureKey=key; S.creatureMap=assignCreatures(names); }
+  return S.creatureMap;
+}
+
 async function renderLobby(){
   const players=await dbGet(`rooms/${S.code}/players`);
   const names=players?Object.keys(players):[];
-  const rows=names.map(n=>`<div class="prow"><span class="pname">${esc(n)}</span>${isMe(n)?'<span class="ptag you">You</span>':''}</div>`).join('');
-  document.getElementById('lobbyPlayers').innerHTML =
-    `<div class="players" style="margin-bottom:0;"><div class="players-title">Present (${names.length})</div>${rows||'<div class="log-item">Waiting…</div>'}</div>`;
+  const cmap = creaturesFor(names);
+  const cards = names.map((n,i)=>{
+    const c=cmap[n];
+    return `<div class="delegate ${isMe(n)?'is-you':''}" style="--ink:${c.ink};animation-delay:${i*55}ms;">
+      <div class="medallion"><span class="creature">${c.emoji}</span></div>
+      <div class="delegate-name">${esc(n)}</div>
+      <div class="delegate-role">${c.name}${isMe(n)?' · You':''}</div>
+    </div>`;
+  }).join('');
+
+  const empties = Math.max(0, 5-names.length);
+  const ghosts = Array.from({length:empties},()=>
+    `<div class="delegate ghost"><div class="medallion"><span class="creature">?</span></div>
+     <div class="delegate-name">Vacant</div><div class="delegate-role">Awaiting</div></div>`).join('');
+
+  const rosterKey = names.join('|');
+  if(rosterKey !== S.rosterKey){
+    S.rosterKey = rosterKey;
+    document.getElementById('lobbyPlayers').innerHTML =
+      `<div class="delegates-head">
+         <span class="delegates-count">${names.length}</span>
+         <span class="delegates-label">${names.length===1?'delegate present':'delegates present'}</span>
+       </div>
+       <div class="delegates">${cards}${ghosts}</div>`;
+  }
   const btn=document.getElementById('dealBtn'), hint=document.getElementById('lobbyHint');
   if(names.length<5){
     btn.disabled=true; btn.textContent=`Need 5 players (${names.length} here)`;
